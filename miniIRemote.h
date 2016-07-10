@@ -12,12 +12,18 @@
 * if (code > 0) { your code }
 */
 
-#define IRpin_PIN      PINB
+//I keep it for debugging propose 
+/*
+#define IRPort         PINB
 #define IRpin          3
+#define getPulse       (IRPort & _BV(IRpin))
+*/
+//#define getPulse      digitalRead(irPin) //slow, not work
 
-#define getPulse       (IRpin_PIN & _BV(IRpin))
+#define getPulse      (digitalPinToPort(irPin) & digitalPinToBitMask(irPin))
 
 #define DEBUG //enable it to send out info over Serial, not work in attiny
+
 namespace miniIR 
 {
 #ifdef USB_CFG_IOPORTNAME //check if vusb used, to call usbPoll()
@@ -46,13 +52,20 @@ namespace miniIR
 #define IR_LO_DATACOME 0
 #define IR_LONG_LENGTH 2500
 */
-
+	uint8_t irPin = -1;
+	
+	PROGMEM void init(uint8_t pin)
+	{
+		irPin = pin;		
+		pinMode(irPin, INPUT); // Set IR pin as input
+	}
+	
 	#ifdef DEBUG
 	uint16_t maxLength = 0;
 	uint16_t minLength = 0;
 	#endif 
 
-	uint32_t Read()
+	PROGMEM uint32_t Read()
 	{  
 	  uint16_t lo_pulse =0, hi_pulse =0;
 	  
