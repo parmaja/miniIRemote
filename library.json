@@ -1,0 +1,12 @@
+{
+  "name": "miniIRemote",
+  "keywords": "infrared, receiver, ir, remote",
+  "description": "Receive IR remote control reader/receiver into 32 bit code",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/parmaja/miniIRemote.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "atmelavr"
+}

@@ -1,0 +1,21 @@
+{
+  "packages": [
+    {
+      "name": "attiny",
+      "maintainer": "Zaher Dirkey",
+      "websiteURL": "https://github.com/parmaja/miniIRemote",
+      "email": "",
+      "platforms": [
+        {
+          "name": "*",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Sensors",
+          "url": "",
+          "archiveFileName": "",
+          "checksum": "SHA-256:xxx",
+          "size": "5005",
+          ]
+        }
+	}
+}
