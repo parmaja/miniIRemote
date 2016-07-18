@@ -1,18 +1,31 @@
 /**
 *   miniIRemote, read IR sensor pulses reader return a code (uint32).
 *
-* @license   The MIT License (MIT) Included in this distribution
+* @license   The MIT License (MIT) 
 *
 * @ref:
 *    
 * @author:    Zaher Dirkey <zaherdirkey at yahoo dot com>
 * @usage:
 *
-* unsigned long code = miniIR::Read();
-* if (code > 0) { your code }
+* unsigned long irNumber = miniIR::Read();
+* if (irNumber > 0) { your code }
+*
+* TODO:
+*   Skip bit 
+*   Reverse bits
+*
 */
 
 //I keep it for debugging propose 
+
+//Attiny:
+/*
+#define IRPort PINB
+#define IRPin 0
+#define getPulse       (IRPort & _BV(IRPin))
+*/
+//Arduino:
 /*
 #define IRPort         PINB
 #define IRPin          3
@@ -21,13 +34,11 @@
 
 //#define getPulse      digitalRead(irPin) //slow, not work
 
-//DIRECT_PIN_READ ported from https://github.com/PaulStoffregen/Encoder/blob/master/utility/direct_pin_read.h#L7
-
+//* DIRECT_PIN_READ ported from https://github.com/PaulStoffregen/Encoder/blob/master/utility/direct_pin_read.h#L7
 #define DIRECT_PIN_READ(base, mask) (((*(base)) & (mask)) ? 1 : 0)
+#define getPulse      DIRECT_PIN_READ(irPort, irPinMask)
 
-#define getPulse      DIRECT_PIN_READ(irPort, digitalPinToBitMask(irDigitalPin))
-
-#define DEBUG //enable it to send out info over Serial, not work in attiny
+//#define DEBUG //enable it to send out info over Serial, not work in attiny, you can define it in your project
 
 namespace miniIR 
 {
@@ -40,7 +51,7 @@ namespace miniIR
 #define IR_RESOLUTION 2 
 #define IR_MAX_LENGTH 5000 //we dont need to not wait forever, at least need to call usbPoll()
 
-//UNIVERSAL
+//UNIVERSAL the most common remote (i have :P)
 #define IR_DATA_LENGTH 600
 #define IR_LO_DATACOME 1500 //Skip first data
 #define IR_LONG_LENGTH 2500
@@ -57,13 +68,15 @@ namespace miniIR
 #define IR_LO_DATACOME 0
 #define IR_LONG_LENGTH 2500
 */
-    static uint8_t irDigitalPin = -1;
+    uint8_t irDigitalPin = -1;
+	uint8_t irPinMask = 0;
 	volatile uint8_t* irPort = 0;
     
     PROGMEM void init(uint8_t pin)
     {
         irDigitalPin = pin;        
 		irPort = portInputRegister(digitalPinToPort(irDigitalPin));
+		irPinMask = digitalPinToBitMask(irDigitalPin);
         pinMode(irDigitalPin, INPUT); // Set IR pin as input
     }
     
@@ -89,7 +102,7 @@ namespace miniIR
           b = false;
           maxLength = 0;
           minLength = 0;
-          #endif DEBUG
+          #endif 
           
           count = 0;
           code = 0;
@@ -104,14 +117,14 @@ namespace miniIR
           count++;
            
           #ifdef DEBUG
-          if (pulse > 25) {
+          if ((pulse > 25) and (count > 1)) { //skipped first one for fine values
             if (!b || (maxLength < pulse))
               maxLength = pulse;
             if (!b || (minLength > pulse))
               minLength = pulse;
             b = true;
           }
-          #endif DEBUG
+          #endif 
         }
       } data;
 
@@ -140,16 +153,16 @@ namespace miniIR
             {
               #ifdef DEBUG
               Serial.print("Long Length");        
-              #endif DEBUG
+              #endif 
               if (!data.started)
                 return 0;
               else 
               {
-                #ifdef DEBUG
-                Serial.print(" Count= ");
-                Serial.println(data.count);
-                #endif DEBUG
-                return data.code;
+				#ifdef DEBUG
+				Serial.print(" Count= ");
+				Serial.println(data.count);
+				#endif 
+				return data.code;
               }
             }
             else if (hi_pulse >= IR_MAX_LENGTH) 
@@ -169,7 +182,7 @@ namespace miniIR
           if ((lo_pulse >= IR_MAX_LENGTH)) {
             #ifdef DEBUG
             Serial.println(" lo pulse IR_MAX_LENGTH ");        
-            #endif DEBUG
+            #endif 
             #ifdef VUSB
             usbPoll(); 
             #endif
