@@ -1,10 +1,12 @@
 ### miniIRemote ###
 IR Remote reader/receiver into 32bit 
 
-##Tested##
-	Attiny85, Atmel328/Arduino IDE 1.6 with common remote controls
+## Tested ##
+ 
+Attiny85, Atmel328/Arduino IDE 1.6 with common remote controls
 
-##Usage##
+## Usage ##
+
 Extract content into "miniIRemote" folder in "library" of arduino 
 Set digital pin number in your setup()
 
@@ -14,7 +16,7 @@ Set digital pin number in your setup()
 	}
 ```
 	
-##Arduino Example##
+## Arduino Example ##
 
 ```c++
   unsigned long code = miniIR::Read();
